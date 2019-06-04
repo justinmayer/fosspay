@@ -9,7 +9,7 @@ WORKDIR /install
 COPY requirements.txt /requirements.txt
 
 RUN \
-    apk add --no-cache postgresql-libs && \
+    apk add --no-cache libpq postgresql-libs && \
     apk add --no-cache --virtual .build-deps gcc libffi-dev musl-dev postgresql-dev && \
     python3 -m pip install --install-option="--prefix=/install" -r /requirements.txt --no-cache-dir && \
     apk --purge del .build-deps
@@ -31,6 +31,7 @@ RUN make
 FROM base
 
 COPY --from=pydeps /install /usr/local
+RUN apk --no-cache add libpq
 RUN mkdir /app
 COPY --from=assets /assets/static /app/static
 COPY . /app
